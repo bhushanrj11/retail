@@ -1,0 +1,72 @@
+#dataTable_filter{	
+	float: right;
+}
+#dataTable_paginate{
+	float: right;
+}
+.required{
+	color: #D50000;
+}
+.add-btn{
+	margin-right: 16px;
+	margin-top: 16px;
+	font-weight: bold;
+	width: 16%;
+	position: absolute;
+    right: 12px;
+    top: 2px;
+
+}
+.padding-6{
+	padding: 6px !important;
+}  
+
+#dataTable_wrapper .row .col-sm-6{
+	width: 40%;
+}
+
+.navbar-default .navbar-brand {
+    color: #7289e2;
+}
+
+.show-on-selection{
+	display: none;
+}
+.form-horizontal .control-label{
+	margin-top: 10px;
+}
+.final-number{
+	font-size: 16px;
+	margin-left: 5px;
+	text-align: right;
+	margin-right: 3%;
+}
+.amounts-section{
+    margin-right: 65px;	
+}
+.form-group {
+    margin-bottom: 6px;
+}
+.bold{
+	font-weight: bold;
+}
+.amounts-section [class*="col-"]{
+	padding: 0 !important;
+}
+.btn-save-print{
+	margin-left: 12px;
+}
+/*.transpernt-form, .transpernt-form:hover{
+	border: transparent;
+}*/
+/*#dataTable_filter label .form-control.input-sm{
+	padding: 8px 16%;
+}*/
+
+@media (min-width: 768px){
+	.navbar>.container .navbar-brand, .navbar>.container-fluid .navbar-brand {
+	    margin-left: 0px; 
+	    font-weight: bold;
+	    font-size: 26px;
+	}
+}
