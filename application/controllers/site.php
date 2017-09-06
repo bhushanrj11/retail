@@ -178,13 +178,80 @@ class Site extends CI_Controller {
 		$this->load->view('main',$data);
 	}
 
+	public function orders(){
+		$data['urlStocks'] = URLSTOCKS;
+		$data['tableHeading'] = array('Sr.','Company','Customer','Bill No.','Total Amount','Order','Action');
+
+		$data['orders'] = $this->Get_model->getOrders(0);
+		$data['completeOrders'] = $this->Get_model->getOrders(1);
+		// echo "<pre>";
+		// print_r($data['orders']);
+		// die;
+		$data['page_title'] = 'Orders';
+		$data['view_file'] = 'orders';
+		$this->load->view('main',$data);
+	}
+
 	public function sell_order(){
 		$data['urlStocks'] = URLSTOCKS;
 		$data['page_title'] = 'Sell Order';
 		$data['view_file'] = 'sell_order';
 		$this->load->view('main',$data);
 	}
-	public function add_sell_order(){
+	public function add_sell_order($salesHeaderID=0){
+		
+		/*ob_start(); // Turn on output buffering
+		system('ipconfig /all'); //Execute external program to display output
+		$mycom=ob_get_contents(); // Capture the output into a variable
+		ob_clean(); // Clean (erase) the output buffer
+		$findme = "Physical";
+		$pmac = strpos($mycom, $findme); // Find the position of Physical text
+		$mac=substr($mycom,($pmac+36),17); // Get Physical Address
+		echo $mac;*/
+		
+		if($this->input->post('print') == 'print'){
+			$this->printFromForm();
+			return false;
+		}
+		
+		$headerData = array();
+		if($this->input->post('id')){
+			$salesHeaderID = $this->input->post('id');
+		}
+
+		$returnData = array();
+		if(count($_POST)){
+			$returnData = $this->Add_model->putSaleOrder($salesHeaderID);
+			if(count($returnData) > 1){
+				if($this->input->post('savePrint')){
+					$company_info =	$this->getAllCompanyInfo($this->input->post('company_info_id'));
+					if(is_array($company_info)){
+						$printInfo = array('company_info' 	=>	$company_info,
+											'cust_name' 	=>	$this->input->post('cust_name'),
+											'formDetails' 	=>  $returnData);
+
+
+						$this->printInvoice($printInfo);
+						return true;
+					} 
+					//$this->load->view('print');
+				} else {
+					echo "<script type='text/javascript'>window.close();</script>";
+					$this->doRedirect('alert-success',ADDCOMPANYINFO, 'site/add_sell_order');
+				}
+			} else {
+				$this->doRedirect('alert-error',ERROR, 'site/add_sell_order');
+			}
+		}
+
+		if($salesHeaderID){
+			$headerData = $this->Get_model->getOrderByID($salesHeaderID);
+			// echo "<pre>";
+			// print_r($data['headerData']);
+			// die()
+		}
+		$data['headerData'] = json_encode( $headerData );
+
 		$data['companyInfoDropdown'] = $this->getAllCompanyInfo();
 		$data['customerInfoDropdown'] = $this->Get_model->getVenderInfo(null,1);
 		
@@ -201,6 +268,79 @@ class Site extends CI_Controller {
 		$data['view_file'] = 'add_sell_order';
 		$this->load->view('main',$data);
 	}
+
+	public function add_purchase_order($salesHeaderID=0){
+		
+		/*ob_start(); // Turn on output buffering
+		system('ipconfig /all'); //Execute external program to display output
+		$mycom=ob_get_contents(); // Capture the output into a variable
+		ob_clean(); // Clean (erase) the output buffer
+		$findme = "Physical";
+		$pmac = strpos($mycom, $findme); // Find the position of Physical text
+		$mac=substr($mycom,($pmac+36),17); // Get Physical Address
+		echo $mac;*/
+		
+		if($this->input->post('print') == 'print'){
+			$this->printFromForm();
+			return false;
+		}
+		
+		$headerData = array();
+		if($this->input->post('id')){
+			$salesHeaderID = $this->input->post('id');
+		}
+
+		$returnData = array();
+		if(count($_POST)){
+			$returnData = $this->Add_model->putSaleOrder($salesHeaderID);
+			if(count($returnData) > 1){
+				if($this->input->post('savePrint')){
+					$company_info =	$this->getAllCompanyInfo($this->input->post('company_info_id'));
+					if(is_array($compony_info)){
+						$printInfo = array('company_info' 	=>	$company_info,
+											'cust_name' 	=>	$this->input->post('cust_name'),
+											'formDetails' 	=>  $returnData);
+
+
+						$this->printInvoice($printInfo);
+						return true;
+					} 
+					//$this->load->view('print');
+				} else {
+					echo "<script type='text/javascript'>window.close();</script>";
+					$this->doRedirect('alert-success',ADDCOMPANYINFO, 'site/add_sell_order');
+				}
+			} else {
+				$this->doRedirect('alert-error',ERROR, 'site/add_sell_order');
+			}
+		}
+
+		if($salesHeaderID){
+			$headerData = $this->Get_model->getOrderByID($salesHeaderID);
+			// echo "<pre>";
+			// print_r($data['headerData']);
+			// die()
+		}
+		$data['headerData'] = json_encode( $headerData );
+
+		$data['companyInfoDropdown'] = $this->getAllCompanyInfo();
+		$data['customerInfoDropdown'] = $this->Get_model->getVenderInfo(null,0);
+		
+		$tableInfo = array('id'=> null, 'tableName' => 'item' , 'order_by' => 'name' , 'order_type' => 'ASC');
+		$result = $this->Get_model->get($tableInfo);
+		$data['info']= $result ? $result : array(); 
+
+		$tableInfo = array('id'=> null, 'tableName' => 'item' , 'order_by' => 'name' , 'order_type' => 'ASC');
+		$result = $this->Get_model->get($tableInfo);
+		$data['info']= $result ? $result : array(); 
+		
+		$data['urlStocks'] = URLSTOCKS;
+		$data['page_title'] = 'Add Purchase Order';
+		$data['view_file'] = 'add_purchase_order';
+		$this->load->view('main',$data);
+	}
+
+
 	public function delete($obj = array()){
 		if(! $this->input->post('id') ){
 			echo json_encode(array(	'msg' 	=> 	INVALIDPARAMS,'status'=> 'danger'));
@@ -218,8 +358,8 @@ class Site extends CI_Controller {
 		}
 	}
 
-	public function getAllCompanyInfo(){
-		$tableInfo = array('id'=> null, 'tableName' => 'compony_info' , 'order_by' => 'name' , 'order_type' => 'ASC');
+	public function getAllCompanyInfo($id=null){
+		$tableInfo = array('id'=> $id, 'tableName' => 'compony_info' , 'order_by' => 'name' , 'order_type' => 'ASC');
 		return $this->Get_model->get($tableInfo);
 	}
 
@@ -230,6 +370,28 @@ class Site extends CI_Controller {
 	}
 
 	public function saveSalesOrder(){
-		
+		// echo "<pre>";
+		// print_r($this->input->post('salesHeaderData'));
+		// print_r( $this->input->post('salesLineData'));
+		// die();
+		if(! ( $this->input->post('salesHeaderData') && $this->input->post('salesLineData') ) ){
+			echo json_encode(array(	'msg' 	=> 	INVALIDPARAMS,'status'=> 'danger', 'flag' => 1));
+		} else {
+			echo json_encode( array('msg' => DUPLICATENUMBER,'id'=>  null, 'status'=> 'success', 'flag' => 1) );	
+		}
+	}
+
+	public function printFromForm(){
+		$printInfo = array('company_info' 	=>	$this->getAllCompanyInfo($this->input->post('company_info_id')),
+							'cust_name' 	=>	$this->input->post('cust_name'),
+							'formDetails' 	=>  array('lineData' => $this->Get_model->getSalesLine(), 'headerData' => $this->Get_model->getSalesHeader()[0] ));
+
+		$this->printInvoice($printInfo);
+	}
+
+	public function printInvoice($printInfo=array()){
+		$data['printInfo'] = $printInfo;
+		$this->load->view('print',$data);
+		//die();
 	}
 }

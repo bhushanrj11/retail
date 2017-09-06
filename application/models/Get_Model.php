@@ -50,6 +50,42 @@ class Get_model extends CI_Model{
 						->count_all_results();
 	}
 
+	public function getOrders($is_order_complete){
+		$query = "	SELECT `cust_id`,`comp_id`,`order_date`,`total_amount`,
+					(case when (is_order_complete = 1) 
+					 THEN
+					      'YES' 
+					 ELSE
+					      'NO' 
+					 END) as is_order_complete,
+					concat(c.fname,' ',c.lname) as cutomer_name, m.name as compony_name,s.id as sales_header_id
+					FROM `sales_header` s, custumer_table c, compony_info m
+					where s.cust_id = c.id and s.comp_id = m.id and s.delete_flag = 0 and s.is_order_complete = $is_order_complete 
+					order by is_order_complete desc,compony_name ASC,cutomer_name ASC";
+
+		return $this->db->query($query)->result_array();
+	}
+
+	public function getOrderByID($id=0){
+		if(!$id){
+			return 0;
+		}
+		
+		$saleHeader = $this->db->where('id', $id)->get('sales_header')->result_array();
+		$saleLines = $this->db->where('sales_header_id', $id)->get('sales_line')->result_array();
+
+		return array('saleHeader' => $saleHeader, 'saleLines' => $saleLines);
+
+	}
+
+	public function getSalesHeader(){
+		return $this->db->where('id', $this->input->post('id'))->get('sales_header')->result_array();
+	}
+
+	public function getSalesLine(){
+		return $this->db->where('sales_header_id', $this->input->post('id'))->get('sales_line')->result_array();
+	}
+
 	/*public function getCompanyInfo($id=0){
 		if($id){
 			$this->db->where('id',$id);			

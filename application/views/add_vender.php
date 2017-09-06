@@ -12,7 +12,7 @@
                     <div class="col-md-6">
                         <div class="form-group">
                             <label>First Name</label> <small class="required">*</small>
-                            <input type="text" class="form-control" name="fname" placeholder="Please enter first name" value="<?= @$info['fname'] ?>" required>
+                            <input type="text" class="form-control" name="fname" placeholder="Please enter first name" value="<?= @$info['fname'] ?>" required autofocus>
                         </div>
                     </div>
                     <div class="col-md-6">
@@ -47,23 +47,31 @@
                 </div>
 
                 <div class="row">
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <div class="form-group">
                             <label>Pin Code</label> <small class="required">*</small>
                             <input type="number" class="form-control" name="pin_code" placeholder="Please enter pin code" value="<?= @$info['pin_code'] ?>" required>
                         </div>
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <div class="form-group">
-                            <label>GST Number</label> <small class="required">*</small>
-                            <input type="text" class="form-control" name="gst_no" placeholder="Please enter GST number" value="<?= @$info['gst_no'] ?>" required>
+                            <label>GST Number</label> 
+                            <input type="text" class="form-control" name="gst_no" placeholder="Please enter GST number" value="<?= @$info['gst_no'] ?>" >
                         </div>
                     </div>
+                    <?php if(@$page_title == 'Add Vender'){ ?>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label>GST Percentage</label> 
+                                <input type="number" class="form-control" name="gst_percentage" placeholder="Please enter GST Percentage" value="<?= @$info['gst_percentage'] ? @$info['gst_percentage'] : 0 ?>">
+                            </div>
+                        </div>
+                    <?php } ?>    
                 </div>
 
                 <div class="col-md-12">
                     <small class="pull-left required" >* </small><small>Required Fileds</small>
-                    <button type="submit" class="btn btn-info btn-fill pull-right">Add <?php echo $page_title; ?> </button>
+                    <button type="submit" class="btn btn-info btn-fill pull-right"> <?php echo $page_title; ?> </button>
                 </div>
                 <div class="clearfix"></div>
             </form>

@@ -35,7 +35,7 @@
         <div class="thumbnail"><img src="<?php echo base_url('assets/img/tmp.svg.png'); ?>" /></div>
      
         <form class="login-form" action="<?php echo base_url('login/validate'); ?>" method="post">
-            <input type="text" placeholder="username" name="email" required/>
+            <input type="text" placeholder="username" name="email" required autofocus />
             <input type="password" placeholder="password" name="passwd" required/>
             <button type="submit">login</button>
         </form>

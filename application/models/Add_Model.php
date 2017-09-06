@@ -69,6 +69,9 @@ class Add_model extends CI_Model{
 			case 'unit_measure':
 				$tableName = 'unit_measure';
 				break;
+			case 'orders':
+				$tableName = array('id' => 'sales_header', 'sales_header_id' => 'sales_line' );
+				break;	
 			default:
 				# code...
 				break;
@@ -78,8 +81,16 @@ class Add_model extends CI_Model{
 		if(!$tableName){
 			return 0;
 		}
-		$this->db->where('id',$this->input->post('id'));
-		return $this->db->update($tableName ,array('delete_flag' => 1));		
+		if(is_array($tableName)){
+			foreach ($tableName as $key => $value) {
+				$this->db->where($key,$this->input->post('id'));
+				$this->db->update($value ,array('delete_flag' => 1));
+			}	
+			return true;	
+		} else{
+			$this->db->where('id',$this->input->post('id'));
+			return $this->db->update($tableName ,array('delete_flag' => 1));		
+		}
 	}
 
 	public function add_vender($flag=0){
@@ -96,6 +107,10 @@ class Add_model extends CI_Model{
 		    'created_on'	=>	date('Y-m-d'),
 		    'created_by'	=>	$this->session->userdata['user_details'][0]['id']
 		);
+
+		if($this->input->post('gst_percentage')){
+			$save_data['gst_percentage'] = $this->input->post('gst_percentage');
+		}
 		
 		if($this->input->post('id')){
 			$this->db->where('id',$this->input->post('id'));
@@ -149,4 +164,85 @@ class Add_model extends CI_Model{
 		}
 	}
 
+	public function putSaleOrder($salesOrder=0){
+		$is_order_complete = $this->input->post('is_complete_order');
+		$errorFlag = 0;
+		$this->db->trans_begin();
+		$saveDataSalesHeader = array(	'comp_id' 				=> 	$this->input->post('company_info_id'),
+										'cust_id' 				=>	$this->input->post('customer_info_id'),
+										'cust_address' 			=>	$this->input->post('address'),
+										'cust_pin' 				=>	$this->input->post('pin_code'),
+										'cust_mobile' 			=>	$this->input->post('mobile'),
+										'cust_email' 			=>	$this->input->post('email'),
+										'cust_gst_no' 			=>	$this->input->post('gst_no'),
+										'order_date' 			=>	$this->input->post('order_date'),
+										'delivery_date' 		=>	$this->input->post('delivery_date'),
+										'amount_exlcuding_gst' 	=>	$this->input->post('excluding_amount_gst'),
+										'discont' 				=>	$this->input->post('total_discount'),
+										'sgst' 					=>	$this->input->post('sgst'),
+										'cgst' 					=>	$this->input->post('cgst'),
+										'total_amount' 			=>	$this->input->post('total_amount'),
+										'is_order_complete'		=>	$is_order_complete,
+										'created_at'			=>	date('Y-m-d'),
+					    				'created_by'			=>	$this->session->userdata['user_details'][0]['id']
+									);
+		if($salesOrder){
+			$this->db->where('id', $salesOrder)->update('sales_header', $saveDataSalesHeader);
+
+			$this->db->where('sales_header_id', $salesOrder)->delete('sales_line');
+			$lastIdOfSalesHeader = $salesOrder;
+		} else {
+			$this->db->insert('sales_header', $saveDataSalesHeader);
+			$lastIdOfSalesHeader = $this->db->insert_id();
+		}
+		//$lastIdOfSalesHeader = 12;
+
+		$arrayLineData = array();
+		
+		foreach ($this->input->post('sale_price[]') as $key => $value) {
+			
+			$itemDetails = explode("-",$this->input->post('item_id[]')[$key]);
+
+			$saveDataSalesLines = array(	'sales_header_id' 	=>	$lastIdOfSalesHeader, 	
+											'item_id'			=>	$itemDetails[0],
+											'item_name'			=>	$itemDetails[1],
+											'item_sales_price'	=>	$this->input->post('sale_price[]')[$key],
+											'item_qty'			=>	$this->input->post('qty[]')[$key],
+											'item_disc'			=>	$this->input->post('discount[]')[$key],
+											'item_line_amount'	=>	$this->input->post('amount[]')[$key],
+											'created_at'		=>	date('Y-m-d'),
+						    				'created_by'		=>	$this->session->userdata['user_details'][0]['id']
+										);
+			if($is_order_complete){
+				$item = $this->db->where('id', $itemDetails[0])->get('item')->result_array();
+				$availableQty = $item[0]['qty'] - $this->input->post('qty[]')[$key];
+				$this->db->where('id', $itemDetails[0])->update('item', array('qty' => $availableQty));
+				if($availableQty < 0 ){
+					// $this->db->where('sales_header_id', $lastIdOfSalesHeader)->delete('sales_line');
+					// $this->db->where('id', $lastIdOfSalesHeader)->delete('sales_header');
+					$errorFlag = 1;
+					$msgError = "<br>Item Name: ".$item[0]['name']."<br>".
+								"Available Qty: ".$item[0]['qty'];
+				}
+			}
+
+			$this->db->insert('sales_line', $saveDataSalesLines);
+			
+			array_push($arrayLineData,$saveDataSalesLines);
+		}	
+
+		if($errorFlag){
+			$this->db->trans_rollback();
+			$this->doRedirect('alert-danger',QTYERROR.$msgError, 'site/add_sell_order/'.$salesOrder);
+		} else {
+			$this->db->trans_commit();
+			return array('lineData' => $arrayLineData, 'headerData' => $saveDataSalesHeader );
+		}
+	}
+
+	public function doRedirect($type,$msg,$destination){
+		$this->session->set_flashdata('msg_type','alert '.$type);
+		$this->session->set_flashdata('msg', $msg);
+		redirect($destination, 'refresh');
+	}
 }

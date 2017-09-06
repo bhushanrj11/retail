@@ -97,4 +97,5 @@ define('UPDATEUNIT', 'Unit Measure updated successfully');
 define('ERROR', 'Error in API!');
 define('DUPLICATENUMBER', 'Number already exist!');
 define('INVALIDPARAMS', 'Invalid Params!');
-define('URLSTOCKS', json_encode(array('delete' => "site/delete",'validateItemNumber' => 'site/validateNumber','saveSalesOrder' => 'site/saveSalesOrder' ))) ;
+define('QTYERROR', 'Order qty is more than available qty!');
+define('URLSTOCKS', json_encode(array('delete' => "site/delete",'validateItemNumber' => 'site/validateNumber', 'saveSalesOrder' => 'site/saveSalesOrder')));

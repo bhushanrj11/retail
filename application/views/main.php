@@ -54,10 +54,22 @@
                             <p>Dashboard</p>
                         </a>
                     </li>
-                    <li class="<?php echo $view_file == 'sell_order' ? "active" : ""  ?>">
+                    <li class="<?php echo $view_file == 'add_sell_order' ? "active" : ""  ?>">
                         <a href="<?php echo base_url('site/add_sell_order') ?>">
                             <i class="pe-7s-cart"></i>
                             <p>Sell Order</p>
+                        </a>
+                    </li>
+                    <li class="<?php echo $view_file == 'orders' ? "active" : ""  ?>">
+                        <a href="<?php echo base_url('site/orders') ?>">
+                            <i class="pe-7s-wallet"></i>
+                            <p>Orders</p>
+                        </a>
+                    </li>
+                    <li class="<?php echo $view_file == 'add_purchase_order' ? "active" : ""  ?>">
+                        <a href="<?php echo base_url('site/add_purchase_order') ?>">
+                            <i class="pe-7s-box1"></i>
+                            <p>Add Purchase Order</p>
                         </a>
                     </li>
                     <li class="<?php echo ($view_file == 'company_info' || $view_file == 'add_company_info') ? "active" : ""  ?>">
