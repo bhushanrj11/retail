@@ -21,8 +21,29 @@ class Site extends CI_Controller {
 	}
 
 	public function dashbord(){
+
+		// ob_start(); 
+		// system('ipconfig /all'); 
+		// $mycom=ob_get_contents();
+		// ob_clean(); 
+
+		// $findme = "Physical"; 
+		// $pmac = strpos($mycom, $findme); 
+		// $mac=substr($mycom,($pmac+36),17); 
+
+		// echo $mac; 
+
+
+		
 		$Urlstocks = array(	'userStatus' 	=> 	base_url('dashbord/userStatus'),
 							'logout'		=>	base_url('login/logout'));
+
+		$data['total_sell'] = $this->Get_model->getTotalSell();
+		$data['total_orders'] = $this->Get_model->getTotalOrders();
+		$counts = $this->Get_model->getCustmerAndVender();
+		$data['total_cust'] = $counts[0]['type'];
+		$data['total_vender'] = $counts[1]['type'];
+		$data['urlStocks'] = URLSTOCKS;
 		$data['page_title'] = 'Dashboard';
 		$data['view_file'] = 'dashboard';
 		$this->load->view('main',$data);
@@ -46,7 +67,6 @@ class Site extends CI_Controller {
 			} else {
 				$this->doRedirect('alert-error',ERROR, 'site/company_info');
 			}
-			
 		}
 		if($id){
 			$tableInfo = array('id'=> $id, 'tableName' => 'compony_info' , 'order_by' => 'name' , 'order_type' => 'ASC');
@@ -178,6 +198,20 @@ class Site extends CI_Controller {
 		$this->load->view('main',$data);
 	}
 
+	public function purchase_orders(){
+		$data['urlStocks'] = URLSTOCKS;
+		$data['tableHeading'] = array('Sr.','Company','Customer','Bill No.','Total Amount','Order','Action');
+
+		$data['orders'] = $this->Get_model->getPurchaseOrders(0);
+		$data['completeOrders'] = $this->Get_model->getPurchaseOrders(1);
+		// echo "<pre>";
+		// print_r($data['orders']);
+		// die;
+		$data['page_title'] = 'Purchase Orders';
+		$data['view_file'] = 'purchase_orders';
+		$this->load->view('main',$data);
+	}
+
 	public function orders(){
 		$data['urlStocks'] = URLSTOCKS;
 		$data['tableHeading'] = array('Sr.','Company','Customer','Bill No.','Total Amount','Order','Action');
@@ -198,7 +232,7 @@ class Site extends CI_Controller {
 		$data['view_file'] = 'sell_order';
 		$this->load->view('main',$data);
 	}
-	public function add_sell_order($salesHeaderID=0){
+	public function add_sell_order($salesHeaderID=0, $returnOrder = 0){
 		
 		/*ob_start(); // Turn on output buffering
 		system('ipconfig /all'); //Execute external program to display output
@@ -253,7 +287,7 @@ class Site extends CI_Controller {
 		$data['headerData'] = json_encode( $headerData );
 
 		$data['companyInfoDropdown'] = $this->getAllCompanyInfo();
-		$data['customerInfoDropdown'] = $this->Get_model->getVenderInfo(null,1);
+		$data['customerInfoDropdown'] = $this->Get_model->getVenderInfo(null,1,$salesHeaderID);
 		
 		$tableInfo = array('id'=> null, 'tableName' => 'item' , 'order_by' => 'name' , 'order_type' => 'ASC');
 		$result = $this->Get_model->get($tableInfo);
@@ -262,7 +296,9 @@ class Site extends CI_Controller {
 		$tableInfo = array('id'=> null, 'tableName' => 'item' , 'order_by' => 'name' , 'order_type' => 'ASC');
 		$result = $this->Get_model->get($tableInfo);
 		$data['info']= $result ? $result : array(); 
-		
+
+		$data['returnOrder'] = $returnOrder;
+
 		$data['urlStocks'] = URLSTOCKS;
 		$data['page_title'] = 'Add Sell Order';
 		$data['view_file'] = 'add_sell_order';
@@ -281,7 +317,7 @@ class Site extends CI_Controller {
 		echo $mac;*/
 		
 		if($this->input->post('print') == 'print'){
-			$this->printFromForm();
+			$this->printPurchaseFromForm();
 			return false;
 		}
 		
@@ -292,7 +328,7 @@ class Site extends CI_Controller {
 
 		$returnData = array();
 		if(count($_POST)){
-			$returnData = $this->Add_model->putSaleOrder($salesHeaderID);
+			$returnData = $this->Add_model->putPurchaseOrder($salesHeaderID);
 			if(count($returnData) > 1){
 				if($this->input->post('savePrint')){
 					$company_info =	$this->getAllCompanyInfo($this->input->post('company_info_id'));
@@ -308,15 +344,15 @@ class Site extends CI_Controller {
 					//$this->load->view('print');
 				} else {
 					echo "<script type='text/javascript'>window.close();</script>";
-					$this->doRedirect('alert-success',ADDCOMPANYINFO, 'site/add_sell_order');
+					$this->doRedirect('alert-success',ADDCOMPANYINFO, 'site/add_purchase_order');
 				}
 			} else {
-				$this->doRedirect('alert-error',ERROR, 'site/add_sell_order');
+				$this->doRedirect('alert-error',ERROR, 'site/add_purchase_order');
 			}
 		}
 
 		if($salesHeaderID){
-			$headerData = $this->Get_model->getOrderByID($salesHeaderID);
+			$headerData = $this->Get_model->getPurchaseOrderByID($salesHeaderID);
 			// echo "<pre>";
 			// print_r($data['headerData']);
 			// die()
@@ -389,9 +425,17 @@ class Site extends CI_Controller {
 		$this->printInvoice($printInfo);
 	}
 
-	public function printInvoice($printInfo=array()){
+	public function printPurchaseFromForm(){
+		$printInfo = array('company_info' 	=>	$this->getAllCompanyInfo($this->input->post('company_info_id')),
+							'cust_name' 	=>	$this->input->post('cust_name'),
+							'formDetails' 	=>  array('lineData' => $this->Get_model->getPurchaseSalesLine(), 'headerData' => $this->Get_model->getPurchaseSalesHeader()[0] ));
+
+		$this->printInvoice($printInfo, 'purchase_print');
+	}
+
+	public function printInvoice($printInfo=array(), $print = 'print'){
 		$data['printInfo'] = $printInfo;
-		$this->load->view('print',$data);
+		$this->load->view($print, $data);
 		//die();
 	}
 }

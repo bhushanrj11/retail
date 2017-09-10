@@ -4,7 +4,7 @@
         <!-- <div class="header">
             <h4 class="title"> Add Items </h4>
         </div> -->
-
+        
         <div class="content">
             <form id="sale_header" class="form-horizontal" method="post" action="<?php echo base_url('site/add_sell_order') ?>" enctype="multipart/form-data" >
                 <input type="hidden" value="" name="id"></input>
@@ -13,6 +13,7 @@
                 <input type="hidden" value="<?= base_url(); ?>" name="base_path"></input>
                 <input type="hidden" value= '<?= $headerData?>' name="header_data" >
                 <input type="hidden" value= '<?= json_encode($info); ?>' name="itemData" >
+                <input type="hidden" value='<?= $returnOrder; ?>' name='returnOrder'>
 
                 <div class="form-group">
                    <label class="control-label col-md-1" for="email">Company:</label>
@@ -52,6 +53,12 @@
                   </div>    
 
                 <div class="show-on-selection">
+                    <div class="form-group"  id="name-div">
+                       <label class="control-label col-md-1" for="email">Name:</label>
+                       <div class="col-sm-11">
+                            <input type="text" class="form-control transpernt-form" name="name" value="">
+                       </div>
+                    </div>
                     <div class="form-group">
                        <label class="control-label col-md-1" for="email">Address:</label>
                        <div class="col-sm-7">
@@ -106,6 +113,9 @@
                             <th width="15%">Number</th>
                             <th width="15%" class="text-right">Sale Price</th>
                             <th width="15%" class="text-right">Qty</th>
+                            <?php if($returnOrder){ ?>
+                                <th width="10%" class="text-right">Retn. Qty</th>
+                            <?php } ?>
                             <th width="10%" class="text-right">Disc.</th>
                             <th width="20%" class="text-right">Amount</th>
                             <th>Action</th>
@@ -140,7 +150,10 @@
                                 </select>
                             </td>
                             <td><input class="form-control text-right" type="number" name="sale_price[]" onchange="Dashboard.updateAmount(this)" min="0" required></td>
-                            <td> <input class="form-control text-right" type="number" name="qty[]" onchange="Dashboard.updateAmount(this)" min="0" required></input> </td>
+                            <td> <input class="form-control text-right" type="number" name="qty[]" onchange="Dashboard.updateAmount(this)" min="1" required></input> </td>
+                            <?php if(@$returnOrder){ ?>
+                                <td> <input class="form-control text-right" type="number" name="return_qty[]" onchange="Dashboard.updateAmount(this)" min="0"></input> </td>
+                            <?php } ?>
                             <td> <input class="form-control text-right" type="number" name="discount[]" onchange="Dashboard.updateAmount(this)" value="0" min="0" required></input> </td>
                             <td> <input class="form-control text-right" type="number" name="amount[]" onchange="Dashboard.updateAmount(this)" readonly required></input> </td>
                             
@@ -154,13 +167,7 @@
                     <div class="amounts-section">   
                         <div class="row">
                             <div  class="col-md-1 pull-right" > <input type="text" class="final-number col-md-12" required  name="excluding_amount_gst" value="0" id="excluding-amount-gst"> </div> <div class="col-md-2 bold text-right pull-right">Excluding GST : </div> 
-                            <div class="col-md-2 bold text-right pull-left" style="margin-top: 4px;margin-right: 8px;">Complete Order : </div> 
-                            <div  class="col-md-1 pull-left" > 
-                                <select class="form-control" name="is_complete_order" required="">
-                                    <option value="0">No</option>
-                                    <option value="1">Yes</option>
-                                </select>
-                            </div> 
+                            
                         </div>    
                         <div class="row">
                             <div  class="col-md-1 pull-right" > <input type="text" class="final-number col-md-12" required name="total_discount" value="0" id="total-discount"> </div> <div class="col-md-2 bold text-right pull-right">Discount : </div> 
@@ -178,10 +185,20 @@
                     </div>
                     <br>
                     <div class="row">
-                        <div class="col-md-4 pull-right">
+                        <div class="col-md-8 pull-right">
                             <button type="submit" name="savePrint" value="savePrint" class="btn btn-info btn-fill pull-right btn-save-print" onclick="Dashboard.getDefaultPage(this)">Save & Print.</button>
                             <button type="submit" name="save" value="save" class="btn btn-success btn-fill pull-right">Save.</button>
-                            <button type="submit" name="print" value="print" class="btn btn-success btn-fill pull-right" style="display:none">Print.</button>
+                            
+                            <button type="submit" name="print" value="print" class="btn btn-success btn-fill pull-right" style="display:none">Print.</button>                            
+                            
+                            <div  class="col-md-2 pull-right" style="margin-right:12px;"> 
+                                <select class="form-control" name="is_complete_order" required="">
+                                    <option value="0" selected>No</option>
+                                    <option value="1">Yes</option>
+                                </select>
+                            </div> 
+                            <div class="col-md-3 bold text-right pull-right" style="margin-top: 4px;margin-right: 0px;">Complete Order : </div> 
+
                         </div>
                     </div>
                 </div>

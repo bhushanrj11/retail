@@ -7,11 +7,17 @@ var Dashboard = Dashboard || function() {
         load: function() {    
             this.table = $('#dataTable').DataTable();
             var header_data = $('[name="header_data"]').val();
+            var purchase_header_data = $('[name="purchase_header_data"]').val();
+            
             if(header_data && JSON.parse(header_data)['saleHeader']){
                 this.setSellOrderEdit(JSON.parse(header_data));
             }
+
+            if(purchase_header_data && JSON.parse(purchase_header_data)['saleHeader']){
+                this.setSellPurchaseOrderEdit(JSON.parse(purchase_header_data));
+            }
         },
-        setSellOrderEdit: function(obj){
+        setSellPurchaseOrderEdit: function(obj){
             var saleHeader = obj.saleHeader[0],
                 saleLines = obj.saleLines,
                 itemData = JSON.parse($('[name="itemData"]').val());
@@ -20,6 +26,68 @@ var Dashboard = Dashboard || function() {
             $('[name="company_info_id"]').val(saleHeader.comp_id);
             $('[name="customer_info_id"]').val(saleHeader.cust_id).trigger('change');
             
+            $('input[name="address"]').val(saleHeader.cust_address);
+            $('input[name="pin_code"]').val(saleHeader.cust_pin);
+            $('input[name="email"]').val(saleHeader.cust_email);
+            $('input[name="gst_no"]').val(saleHeader.cust_gst_no);
+            $('input[name="mobile"]').val(saleHeader.cust_mobile);
+            $('input[name="order_date"]').val(saleHeader.order_date);
+            $('input[name="delivery_date"]').val(saleHeader.delivery_date);
+
+            $('input[name="excluding_amount_gst"]').val(saleHeader.amount_exlcuding_gst);
+            $('input[name="sgst"]').val(saleHeader.sgst);
+            $('input[name="cgst"]').val(saleHeader.cgst);
+            $('input[name="total_amount"]').val(saleHeader.total_amount);
+            $('[name="is_complete_order"]').val(saleHeader.is_order_complete);
+
+            /**/
+            for(var prop in saleLines){
+                $($('[name="item_id[]"]')[prop]).val(saleLines[prop].item_id + "-" + saleLines[prop].item_name);
+                $($('[name="number[]"]')[prop]).val(saleLines[prop].item_id);
+                $($('[name="sale_price[]"]')[prop]).val(saleLines[prop].item_sales_price);//.data("sale_price",salePrice);
+                $($('[name="qty[]"]')[prop]).val(saleLines[prop].item_qty);
+                $($('[name="vender_price[]"]')[prop]).val(saleLines[prop].item_vender_price);
+                $($('[name="amount[]"]')[prop]).val(saleLines[prop].item_line_amount);
+
+                /*for(var x in itemData){
+                  if(itemData[x].id == saleLines[prop].item_id){
+                    if(parseInt(saleLines[prop].item_qty) > parseInt(itemData[x].qty) ){
+                        $($('[name="qty[]"]')[prop]).val(itemData[x].qty);
+                    }
+                  }
+                }*/
+
+                if((saleLines.length-1) != prop){
+                    $($('.plus-btn')[prop]).trigger('click');
+                }
+            }
+
+            /**/
+            if(saleHeader.is_order_complete == 1){
+                var input = document.createElement('input'),
+                    customer_info_id = $('[name="customer_info_id"]');
+
+                input.setAttribute('name','deummy');
+                $('button').attr('readonly',true).hide();
+                $('select').attr('readonly',true);
+                $('input').attr('readonly',true);
+                $('button[name="print"]').show().attr('readonly', false);
+                $('[name="cust_name"]').val(customer_info_id[0].options[customer_info_id[0].options.selectedIndex].text).attr('readonly', false);
+                $('[name="id"]').attr('readonly', false);
+                $('input[name="company_info_id"]').val($('select[name="company_info_id"]').val()).attr('readonly',false);
+            }
+        },
+        setSellOrderEdit: function(obj){
+            var saleHeader = obj.saleHeader[0],
+                saleLines = obj.saleLines,
+                itemData = JSON.parse($('[name="itemData"]').val());
+
+
+            $('[name="id"]').val(saleHeader.id);
+            $('[name="company_info_id"]').val(saleHeader.comp_id).attr('readonly', true);
+            $('[name="customer_info_id"]').val(saleHeader.cust_id).attr('readonly', true).trigger('change');
+            
+            $('input[name="name"]').val(saleHeader.cust_name).attr('readonly', true);
             $('input[name="address"]').val(saleHeader.cust_address);
             $('input[name="pin_code"]').val(saleHeader.cust_pin);
             $('input[name="email"]').val(saleHeader.cust_email);
@@ -40,7 +108,7 @@ var Dashboard = Dashboard || function() {
                 $($('[name="item_id[]"]')[prop]).val(saleLines[prop].item_id + "-" + saleLines[prop].item_name);
                 $($('[name="number[]"]')[prop]).val(saleLines[prop].item_id);
                 $($('[name="sale_price[]"]')[prop]).val(saleLines[prop].item_sales_price);//.data("sale_price",salePrice);
-                $($('[name="qty[]"]')[prop]).val(saleLines[prop].item_qty);
+                $($('[name="qty[]"]')[prop]).val(saleLines[prop].item_qty_final);
                 $($('[name="discount[]"]')[prop]).val(saleLines[prop].item_disc);
                 $($('[name="amount[]"]')[prop]).val(saleLines[prop].item_line_amount);
 
@@ -63,13 +131,23 @@ var Dashboard = Dashboard || function() {
                     customer_info_id = $('[name="customer_info_id"]');
 
                 input.setAttribute('name','deummy');
-                $('button').attr('disabled',true).hide();
-                $('select').attr('disabled',true);
-                $('input').attr('disabled',true);
-                $('button[name="print"]').show().attr('disabled', false);
-                $('[name="cust_name"]').val(customer_info_id[0].options[customer_info_id[0].options.selectedIndex].text).attr('disabled', false);
-                $('[name="id"]').attr('disabled', false);
-                $('input[name="company_info_id"]').val($('select[name="company_info_id"]').val()).attr('disabled',false);
+                
+                $('select').attr('readonly',true);
+                $('input').attr('readonly',true);
+                if($('[name="returnOrder"]').val() == 0){
+                    $('button').attr('readonly',true).hide();
+                    $('button[name="print"]').show().attr('readonly', false);
+                }    
+                // } else {
+                // }
+
+                $('[name="cust_name"]').val(customer_info_id[0].options[customer_info_id[0].options.selectedIndex].text).attr('readonly', false);
+                $('[name="id"]').attr('readonly', false);
+                $('input[name="company_info_id"]').val($('select[name="company_info_id"]').val()).attr('readonly',false);
+                $('.fa-minus').hide();
+                $('.fa-plus').hide();
+                $('[name="return_qty[]"]').attr('readonly', false);
+                $('[name="discount[]"]').attr('readonly', false);
             }
         },
         openModal: function(self, details, target) {
@@ -90,7 +168,7 @@ var Dashboard = Dashboard || function() {
             var obj = {
                 url: this.baseUrl + this.urlStocks.delete,
                 data: {
-                    id: target == 'orders' ? details.sales_header_id : details.id,
+                    id: (target == 'orders' || target == 'purchase_orders') ? details.sales_header_id : details.id,
                     status: "D",
                     target: target
                 },
@@ -98,7 +176,7 @@ var Dashboard = Dashboard || function() {
                     var data = JSON.parse(data);
                     Dashboard.table.row($('#table-Row-' + data.id)).remove().draw();
                     //$('#table-Row-' + data.id).remove();
-                   // $('#table-Row-' + data.id).find('.action a').attr('disabled');
+                   // $('#table-Row-' + data.id).find('.action a').attr('readonly');
                     Dashboard.showAlert(data,status);
                 }
             };
@@ -119,9 +197,9 @@ var Dashboard = Dashboard || function() {
                     var data = JSON.parse(data);
                     if(data.flag){
                         Dashboard.showAlert(data,data.status);
-                        $('button[type="submit"]').attr('disabled',true);
+                        $('button[type="submit"]').attr('readonly',true);
                     } else {
-                        $('button[type="submit"]').attr('disabled',false);
+                        $('button[type="submit"]').attr('readonly',false);
                     }
                 }
             };
@@ -144,10 +222,18 @@ var Dashboard = Dashboard || function() {
             location.href = this.urlStocks.logout;
         },
         onChangeDropdown: function(self, target){
-            var custData = $(self.options[self.selectedIndex]).data('companyinfo');
+            var custData = $(self.options[self.selectedIndex]).data('companyinfo'),
+                name = custData.fname + " " + custData.lname;
             
             $('.show-on-selection').show();
-            $('input[name="cust_name"]').val(custData.fname + " " + custData.lname);
+            if(name.trim() != "Guest"){
+                $('[name="name"]').attr('readonly', true);
+            } else {
+                $('[name="name"]').attr('readonly', false);
+            }
+
+            $('[name="name"]').val(name);
+            $('input[name="cust_name"]').val(name);
             $('input[name="address"]').val(custData.address);
             $('input[name="pin_code"]').val(custData.pin_code);
             $('input[name="email"]').val(custData.email);
@@ -193,8 +279,9 @@ var Dashboard = Dashboard || function() {
         updateAmount: function(self){
             var parent = $(self).parent().parent(),
                 salePrice = parent.find('input[name="sale_price[]"]').val(),
-                qty = parent.find('input[name="qty[]"]').val(),
-                discount = parseFloat(parent.find('input[name="discount[]"]').val()).toFixed(2),
+                qty = parseInt(parent.find('input[name="qty[]"]').val()),
+                discount = parseFloat(parent.find('input[name="discount[]"]').val()).toFixed(2) == 'NaN' ? 0 : parseFloat(parent.find('input[name="discount[]"]').val()).toFixed(2),
+                returnQty = parseInt(parent.find('input[name="return_qty[]"]').val()),
                 total = 0,
                 sgst = 9,
                 cgst = 9,
@@ -221,10 +308,22 @@ var Dashboard = Dashboard || function() {
             }    
             
             if(salePrice && qty){
+                if(returnQty){
+                    if(qty == returnQty){
+                        qty = 0;
+                    } else if(qty < returnQty){
+                        alert("Return Qty must be less than previous qty!");
+                        return;
+                    } else if(qty > returnQty) {
+                        qty = parseInt(qty - returnQty);
+                    }
+                    //parent.find('input[name="qty[]"]').val(newQty);
+                }
                 total = (salePrice * qty) - discount;
                 amount.val(total);
                 excludingAmount = Dashboard.updateTotals('input[name="amount[]"]', '#excluding-amount-gst');
                 totalDiscount = Dashboard.updateTotals('input[name="discount[]"]', '#total-discount');
+                
                 totalGst = Dashboard.setGst({
                     sgst: {
                         value: sgst,
@@ -236,7 +335,8 @@ var Dashboard = Dashboard || function() {
                         domKey: '#cgst',
                         operator:  '%'
                     }
-                },total);
+                },excludingAmount);
+
                 finalAmount = parseFloat(totalGst) + parseFloat(excludingAmount);
                 $('#total-amount').val(parseFloat(finalAmount).toFixed(2));
             }
@@ -253,7 +353,7 @@ var Dashboard = Dashboard || function() {
         setGst: function(options,total){
             var totalGst = 0;
             for(var prop in options){
-                var tempValue = ((options[prop].value / 100) * total ).toFixed(2);
+                var tempValue = ((options[prop].value / 100) * total).toFixed(2);
                 $(options[prop].domKey).val( tempValue );
                 totalGst += parseFloat(tempValue);
             }
@@ -305,9 +405,9 @@ var Dashboard = Dashboard || function() {
                 venderPrice = parent.find('input[name="vender_price[]"]').val(),
                 qty = parent.find('input[name="qty[]"]').val(),
                 total = 0,
-                gst = ( parseInt( $('[name="gst_percentage"]').val() ) ) || 18,
-                sgst = gst / 2,
-                cgst = gst / 2,
+                gst = ( parseInt( $('[name="gst_percentage"]').val() ) ) || 0,
+                sgst = gst ? (gst / 2 ) : 0,
+                cgst = gst ? (gst / 2 ) : 0,
                 totalGst = 0,
                 excludingAmount = 0,
                 finalAmount = 0,
@@ -321,34 +421,37 @@ var Dashboard = Dashboard || function() {
                 salePrice < $(self).data('sale_price') ? alert(msg) : "";
             }    
 
-            if($(self).data('qty')){
-                var dataQty = parseInt($(self).data('qty'));
-                var msg = 'Qty is more than available qty!' + '\n' + 'Available Qty:' + dataQty;
-                if( dataQty < parseInt(qty)){
-                    alert(msg);
-                    $(self).val(dataQty);
-                    return;
-                }   
+            // if($(self).data('qty')){
+            //     var dataQty = parseInt($(self).data('qty'));
+            //     var msg = 'Qty is more than available qty!' + '\n' + 'Available Qty:' + dataQty;
+            //     if( dataQty < parseInt(qty)){
+            //         alert(msg);
+            //         $(self).val(dataQty);
+            //         return;
+            //     }   
 
-            }    
+            // }    
             
             if(venderPrice && qty){
                 total = (venderPrice * qty);
                 amount.val(total);
                 excludingAmount = Dashboard.updateTotals('input[name="amount[]"]', '#excluding-amount-gst');
                 //totalDiscount = Dashboard.updateTotals('input[name="discount[]"]', '#total-discount');
-                totalGst = Dashboard.setGst({
-                    sgst: {
-                        value: sgst,
-                        domKey: '#sgst',
-                        operator:  '%'
-                    },
-                    cgst: {
-                        value: cgst,
-                        domKey: '#cgst',
-                        operator:  '%'
-                    }
-                },total);
+                if(gst){
+
+                    totalGst = Dashboard.setGst({
+                        sgst: {
+                            value: sgst,
+                            domKey: '#sgst',
+                            operator:  '%'
+                        },
+                        cgst: {
+                            value: cgst,
+                            domKey: '#cgst',
+                            operator:  '%'
+                        }
+                    },total);
+                }
                 finalAmount = parseFloat(totalGst) + parseFloat(excludingAmount);
                 $('#total-amount').val(parseFloat(finalAmount).toFixed(2));
             }        

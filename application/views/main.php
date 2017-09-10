@@ -43,12 +43,12 @@
             <div class="sidebar-wrapper">
                 <div class="logo">
                     <a href="#" class="simple-text">
-                    Govind Furniture 
+                    <!-- Govind Furniture  -->
                 </a>
                 </div>
                 <ul class="nav">
                    
-                    <li class="<?php echo $view_file == 'dashbord' ? "active" : ""  ?>">
+                    <li class="<?php echo $view_file == 'dashboard' ? "active" : ""  ?>">
                         <a href="<?php echo base_url('site/dashbord') ?>">
                             <i class="pe-7s-graph"></i>
                             <p>Dashboard</p>
@@ -66,12 +66,18 @@
                             <p>Orders</p>
                         </a>
                     </li>
-                    <li class="<?php echo $view_file == 'add_purchase_order' ? "active" : ""  ?>">
+                    <li class="<?php echo $view_file == 'purchase_orders' ? "active" : ""  ?>">
+                        <a href="<?php echo base_url('site/purchase_orders') ?>">
+                            <i class="pe-7s-folder"></i>
+                            <p>Purchase Orders</p>
+                        </a>
+                    </li>
+                   <!--  <li class="<?php echo $view_file == 'add_purchase_order' ? "active" : ""  ?>">
                         <a href="<?php echo base_url('site/add_purchase_order') ?>">
                             <i class="pe-7s-box1"></i>
                             <p>Add Purchase Order</p>
                         </a>
-                    </li>
+                    </li> -->
                     <li class="<?php echo ($view_file == 'company_info' || $view_file == 'add_company_info') ? "active" : ""  ?>">
                         <a href="<?php echo base_url('site/company_info') ?>">
                             <i class="pe-7s-science"></i>

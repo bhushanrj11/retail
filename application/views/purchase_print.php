@@ -146,9 +146,9 @@
             <table border='1' cellspacing='0'>
                 <tr>
                     <th width=150>Item Name</th>
-                    <th width=80>Price</th>
                     <th width=100>Qty.</th>
-                    <th width=100>Disc</th>
+                    <th width=100>Vender Price</th>
+                    <!-- <th width=80>Sale Price</th> -->
                     <th width=100>Amount</th>
                 </tr>
  
@@ -163,15 +163,17 @@
                     <td>
                         <?= $lineData[$i]['item_name']; ?>
                     </td>
+                    
                     <td>
+                        <?= $lineData[$i]['item_qty']; ?>
+                    </td>
+                    <td>
+                        <?= $lineData[$i]['item_vender_price']; ?>
+                    </td>
+                    <!-- <td>
                         <?= $lineData[$i]['item_sales_price']; ?>
-                    </td>
-                    <td>
-                        <?= $lineData[$i]['item_qty_final']; ?>
-                    </td>
-                    <td>
-                        <?= $lineData[$i]['item_disc']; ?>
-                    </td>
+                    </td> -->
+                   
                     <td>
                         <?= $lineData[$i]['item_line_amount']; ?>
                     </td>
@@ -180,25 +182,23 @@
             <?php } ?>
            <?php  
             echo("<tr>");
-            echo("<td colspan='4' class='text-right'>Excluding GST:</td>");
+            echo("<td colspan='3' class='text-right'>Excluding GST:</td>");
             echo("<td class='text-right'>" . $printInfo['formDetails']['headerData']['amount_exlcuding_gst'] . "</td>");
             echo("</tr>");
             echo("<tr>");
-            echo("<td colspan='4' class='text-right'>Discount:</td>");
-            echo("<td class='text-right'>" . $printInfo['formDetails']['headerData']['discont'] . "</td>");
             echo("</tr>");
             ?>
             <?php  
             echo("<tr>");
-            echo("<td colspan='4' class='text-right'>SGST (9%): </td>");
+            echo("<td colspan='3' class='text-right'>SGST : </td>");
             echo("<td class='text-right'>" . $printInfo['formDetails']['headerData']['sgst'] . "</td>");
             echo("</tr>");
             echo("<tr>");
-            echo("<td colspan='4' class='text-right'>CGST (9%):</td>");
+            echo("<td colspan='3' class='text-right'>CGST :</td>");
             echo("<td class='text-right'>" . $printInfo['formDetails']['headerData']['cgst'] . "</td>");
             echo("</tr>");
             echo("<tr>");
-            echo("<td colspan='4' class='text-right'><b>TOTAL AMOUNT</b></td>");
+            echo("<td colspan='3' class='text-right'><b>TOTAL AMOUNT</b></td>");
             echo("<td class='text-right'><b>" . $printInfo['formDetails']['headerData']['total_amount'] . "</b></td>");
             echo("</tr>");
             ?>

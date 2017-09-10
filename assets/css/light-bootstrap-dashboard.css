@@ -802,7 +802,10 @@ body > .navbar-collapse {
 .form-control[disabled], .form-control[readonly], fieldset[disabled] .form-control {
   background-color: #F5F5F5;
   color: #888888;
-  cursor: not-allowed; }
+  cursor: not-allowed; 
+  pointer-events: none;
+
+}
 
 .input-group-btn .btn {
   border-width: 1px;

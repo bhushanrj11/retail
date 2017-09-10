@@ -11,7 +11,7 @@
                 <input type="hidden" value="" name="cust_name"></input>
                 <input type="hidden" value="" name="company_info_id" disabled></input>
                 <input type="hidden" value="<?= base_url(); ?>" name="base_path"></input>
-                <input type="hidden" value= '<?= $headerData?>' name="header_data" >
+                <input type="hidden" value= '<?= $headerData?>' name="purchase_header_data" >
                 <input type="hidden" value= '<?= json_encode($info); ?>' name="itemData" >
                 <input type="hidden" value="" name="gst_percentage"></input>
 

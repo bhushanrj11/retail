@@ -17,8 +17,8 @@
                     </div>
                     <div class="col-md-6">
                         <div class="form-group">
-                            <label>Last Name</label> <small class="required">*</small>
-                            <input type="text" class="form-control" name="lname" placeholder="Please enter last name" value="<?= @$info['lname'] ?>" required>
+                            <label>Last Name</label> 
+                            <input type="text" class="form-control" name="lname" placeholder="Please enter last name" value="<?= @$info['lname'] ?>">
                         </div>
                     </div>
                    

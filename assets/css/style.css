@@ -90,3 +90,9 @@
 	    font-size: 26px;
 	}
 }
+
+.panel-user{
+	padding: 0;
+	margin-left: 10px;
+	width: 24%;
+}
