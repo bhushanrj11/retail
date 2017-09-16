@@ -8,6 +8,7 @@ var Dashboard = Dashboard || function() {
             this.table = $('#dataTable').DataTable();
             var header_data = $('[name="header_data"]').val();
             var purchase_header_data = $('[name="purchase_header_data"]').val();
+            var loadGraphDataValues = $('#loadGraphSeriesLables').val();
             
             if(header_data && JSON.parse(header_data)['saleHeader']){
                 this.setSellOrderEdit(JSON.parse(header_data));
@@ -16,6 +17,41 @@ var Dashboard = Dashboard || function() {
             if(purchase_header_data && JSON.parse(purchase_header_data)['saleHeader']){
                 this.setSellPurchaseOrderEdit(JSON.parse(purchase_header_data));
             }
+
+            if(loadGraphDataValues){
+                this.loadGraph();
+            }
+
+        },
+        loadGraph: function(){
+            var values = JSON.parse($('#loadGraphSeriesLables').val()),
+                data = {
+                  labels: values[0],
+                  series: [
+                    values[1]
+                  ]
+                },
+                options = {
+                    seriesBarDistance: 10,
+                    axisX: {
+                        showGrid: false
+                    },
+                    height: "300px"
+                },
+                responsiveOptions = [
+                  ['screen and (max-width: 640px)', {
+                    seriesBarDistance: 5,
+                    axisX: {
+                      labelInterpolationFnc: function (value) {
+                        return value[0];
+                      }
+                    }
+                  }]
+                ];
+            $('[name="start_date"]').val(values[2]);    
+            $('[name="end_date"]').val(values[3]);    
+
+            Chartist.Bar('#chartActivity', data, options, responsiveOptions);
         },
         setSellPurchaseOrderEdit: function(obj){
             var saleHeader = obj.saleHeader[0],
@@ -134,10 +170,7 @@ var Dashboard = Dashboard || function() {
                 
                 $('select').attr('readonly',true);
                 $('input').attr('readonly',true);
-                if($('[name="returnOrder"]').val() == 0){
-                    $('button').attr('readonly',true).hide();
-                    $('button[name="print"]').show().attr('readonly', false);
-                }    
+
                 // } else {
                 // }
 
@@ -148,6 +181,11 @@ var Dashboard = Dashboard || function() {
                 $('.fa-plus').hide();
                 $('[name="return_qty[]"]').attr('readonly', false);
                 $('[name="discount[]"]').attr('readonly', false);
+                if($('[name="returnOrder"]').val() == 0){
+                    $('[name="discount[]"]').attr('readonly', true);
+                    $('button').attr('readonly',true).hide();
+                    $('button[name="print"]').show().attr('readonly', false);
+                }  
             }
         },
         openModal: function(self, details, target) {

@@ -41,8 +41,12 @@ class Site extends CI_Controller {
 		$data['total_sell'] = $this->Get_model->getTotalSell();
 		$data['total_orders'] = $this->Get_model->getTotalOrders();
 		$counts = $this->Get_model->getCustmerAndVender();
-		$data['total_cust'] = $counts[0]['type'];
-		$data['total_vender'] = $counts[1]['type'];
+		$result = $this->Get_model->loadGraphSeriesLables();
+		$data['loadGraphSeriesLables'] = $result;
+		//$data['loadGraphLables'] = $result[1];
+		
+		$data['total_cust'] = $counts ? $counts[0]['type'] : 0;
+		$data['total_vender'] = $counts ? $counts[1]['type'] : 0;
 		$data['urlStocks'] = URLSTOCKS;
 		$data['page_title'] = 'Dashboard';
 		$data['view_file'] = 'dashboard';
@@ -100,7 +104,7 @@ class Site extends CI_Controller {
 		$data['urlStocks'] = URLSTOCKS;
 		if(count($_POST)){
 			if($this->Add_model->add_vender()){
-				$this->doRedirect('alert-success',ADDCOMPANYINFO, 'site/vender');
+				$this->doRedirect('alert-success',ADDCOMPANYINFO, 'site/vender/'.$type);
 			} else {
 				$this->doRedirect('alert-error',ERROR, 'site/vender');
 			}
@@ -113,6 +117,8 @@ class Site extends CI_Controller {
 			$data['page_title'] = 'Add Vender';
 			$data['page_type'] = '0';	
 		}
+
+		$data['id'] = $id;
 		
 		if($id){
 			$result = $this->Get_model->getVenderInfo($id,$type);			

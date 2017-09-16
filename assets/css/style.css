@@ -76,6 +76,21 @@
 	cursor: not-allowed;
 }
 
+.panel-graph{
+	width: 96%;
+	padding: 0;
+	margin-left: 24px
+}
+
+.date-form{
+	margin-top: 12px;
+}
+
+.date-form div, .date-form button{
+	margin-left: 12px;
+	padding: 4px 10px;
+}
+
 /*.transpernt-form, .transpernt-form:hover{
 	border: transparent;
 }*/

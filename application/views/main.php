@@ -196,7 +196,7 @@
 <!--  Checkbox, Radio & Switch Plugins -->
 <!--script src="assets/js/bootstrap-checkbox-radio-switch.js"></script-->
 <!--  Charts Plugin -->
-<!--script src="assets/js/chartist.min.js"></script-->
+<script src="<?php echo base_url('assets/js/chartist.min.js')?>"></script>
 <script src="<?php echo base_url('assets/js/jquery.dataTables.min.js');?>" type="text/javascript"></script>
 <script src="<?php echo base_url('assets/js/dataTables.bootstrap.min.js');?>" type="text/javascript"></script>
 

@@ -5,7 +5,7 @@
             <h4 class="title"> Add <?php echo $page_title; ?> </h4>
         </div> -->
         <div class="content">
-            <form method="post" action="<?php echo base_url('site/add/').$page_type ?>" enctype="multipart/form-data">
+            <form method="post" action="<?php echo base_url('site/add/').$id."/".$page_type ?>" enctype="multipart/form-data">
                 <input type="hidden" value="<?= @$info['id'] ?>" name="id"></input>
                 <input type="hidden" value="<?= @$page_type ?>" name="type"></input>
                 <div class="row">
